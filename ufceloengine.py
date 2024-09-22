@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import json
 
 # Load the CSV
 ufcfights_not_sorted = pd.read_csv("ufcfights_update.csv", index_col=0)
@@ -41,6 +42,30 @@ ufcfights['fighter_2_elo_start'] = 0
 ufcfights['fighter_1_elo_end'] = 0
 ufcfights['fighter_2_elo_end'] = 0
 
+prediction_results = {
+    0: [],
+    5: [],
+    10: [],
+    15: [],
+    20: [],
+    25: [],
+    30: [],
+    35: [],
+    40: [],
+    45: [],
+    50: [],
+    55: [],
+    60: [],
+    65: [],
+    70: [],
+    75: [],
+    80: [],
+    85: [],
+    90: [],
+    95: [],
+    100: []
+}
+
 # Calculate Elo ratings for each match
 for index, row in ufcfights.iterrows():
     fighter_1 = row['fighter_1']
@@ -60,11 +85,16 @@ for index, row in ufcfights.iterrows():
     ufcfights.at[index, 'fighter_1_elo_start'] = fighter_1_elo_start
     ufcfights.at[index, 'fighter_2_elo_start'] = fighter_2_elo_start
 
-    # Update Elo based on the result
+    # Update Elo and Prediction Dict based on the result
+    rounded_odds = round(expected_score(fighter_1_elo_start, fighter_2_elo_start) * 20) * 5
     if row['result'] == 'win':  # Fighter 1 wins
         new_fighter1_elo, new_fighter2_elo = update_elo(fighter_1_elo_start, fighter_2_elo_start, k_factor)
+        prediction_results[rounded_odds].append(1)
+        prediction_results[100-rounded_odds].append(0)
     elif row["result"] == 'draw':  # Draw
         new_fighter1_elo, new_fighter2_elo = update_elo(fighter_1_elo_start, fighter_2_elo_start, k_factor / 2)
+        prediction_results[rounded_odds].append(0.5)
+        prediction_results[100-rounded_odds].append(0.5)
     else:  # No contest
         new_fighter1_elo, new_fighter2_elo = fighter_1_elo_start, fighter_2_elo_start
 
@@ -120,3 +150,15 @@ fighter_name = "Conor McGregor"
 fighter_info = get_fighter_info(fighter_name, elo_ratings, ufcfights)
 print(fighter_info)
 '''
+
+prediction_accuracy = {}
+for key, value in prediction_results.items():
+    if len(value) == 0: 
+        prediction_accuracy[key] = 0
+        continue
+    prediction_accuracy[key] = round(sum(value) / len(value), 2) * 100
+
+# create/write a .json file with the predictions
+
+with open('predictions.json', 'w') as f:
+    json.dump(prediction_accuracy, f)
