@@ -159,6 +159,5 @@ for key, value in prediction_results.items():
     prediction_accuracy[key] = round(sum(value) / len(value), 2) * 100
 
 # create/write a .json file with the predictions
-
 with open('predictions.json', 'w') as f:
     json.dump(prediction_accuracy, f)
