@@ -12,3 +12,8 @@ https://www.youtube.com/watch?v=PLwhzlyjEgU
 # Purposes of This Fork
 
 The current purpose of this branch is to find an optimal k-value, providing insight on the volatility of UFC fighters' skill and for more accurate rankings.
+
+## Changes Made
+`predictions.json`
+Dictionary of the predicted fight odds (rounded to the nearest 5 percent) and the actual fight outcomes.
+For example, line 7 shows that a fighter was predicted to win 25% of the time, they would win 22% of the time.
